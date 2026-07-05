@@ -121,8 +121,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
   "The specification1" should {
     "returns an appropriate response" in {
       val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      //val knowledge1 = Knowledge(sentenceA,"ja_JP", "{}", false, List(imageA))
+      val sentenceId1 = getUUID()      
       val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
       val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
@@ -403,8 +402,8 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val sentenceId3 = getUUID()
       val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
       val knowledge2 = getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val paraphrase1 = Knowledge(paraphraseA, "ja_JP", "{}", false)
-      val paraphrase2 = Knowledge(paraphraseB, "ja_JP", "{}", false)
+      val paraphrase1 = Knowledge(paraphraseA, lang, "{}", false)
+      val paraphrase2 = Knowledge(paraphraseB, lang, "{}", false)
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
       registerSingleClaim(KnowledgeForParser(propositionId2, sentenceId2, knowledge2), transversalState)
