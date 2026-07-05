@@ -3,11 +3,11 @@ on:
   workflow_call:
 env:
   PJ_ACTOR: toposoid
-  PJ_REPO: toposoid-clause-deduction-unit-common-web
+  PJ_REPO: toposoid-embedding-deduction-unit-common-web
   PJ_BRANCH: feature
   PJ_VERSION: 0.7-SNAPSHOT
 jobs:
-  unit-test_toposoid-clause-deduction-unit-common-web-arm64:
+  unit-test_toposoid-embedding-deduction-unit-common-web-arm64:
     runs-on: [self-hosted, linux, ARM64]
     steps:
       - name: Clone ${{ env.PJ_REPO }}
