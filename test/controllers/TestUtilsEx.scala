@@ -37,11 +37,10 @@ import com.ideal.linked.toposoid.knowledgebase.model.KnowledgeFeatureReference
 import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForImage
 import com.ideal.linked.toposoid.knowledgebase.regist.model.Reference
 import com.ideal.linked.toposoid.knowledgebase.regist.model.ImageReference
-import com.ideal.linked.toposoid.knowledgebase.featurevector.model.RegistContentResult
 import com.ideal.linked.toposoid.knowledgebase.regist.model.Knowledge
 import com.ideal.linked.toposoid.protocol.model.frontend.Endpoint
 
-case class ImageBoxInfo(x:Int, y:Int, weight:Int, height:Int)
+//case class ImageBoxInfo(x:Int, y:Int, weight:Int, height:Int)
 
 object TestUtilsEx {
   val neo4JUtils = new Neo4JUtilsImpl()
@@ -78,7 +77,7 @@ object TestUtilsEx {
     usedUuidList = usedUuidList :+ uuid
     uuid
   }
-
+  /*
   def getKnowledge(lang:String, sentence: String, reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): Knowledge = {
     Knowledge(sentence, lang, "{}", false, List(getImageInfo(reference, imageBoxInfo, transversalState)))
   }
@@ -176,5 +175,5 @@ object TestUtilsEx {
     Json.toJson(AnalyzedSentenceObjects(updatedAsos, analyzedSentenceObjects.deductionConfiguration)).toString
     
   }
-
+  */
 }
