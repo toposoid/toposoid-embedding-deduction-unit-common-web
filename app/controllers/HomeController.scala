@@ -192,11 +192,14 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     val featureVectorSearchResultJson: String = ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "search", transversalState)
     val result = Json.parse(featureVectorSearchResultJson).as[FeatureVectorSearchResult]
 
-    //VecotrDBにClaimとして存在している場合に推論が可能になる
+    //VecotrDBにClaimとして存在している場合かつ精度よく一致しているものが存在している場合にのみ推論が可能になる。前提が間違っていると推論は破綻する立場をとる。
     val (ids, similarities) = (result.ids zip result.similarities).foldLeft((List.empty[FeatureVectorIdentifier], List.empty[Float])) {
       (acc, x) => {
         x._1.sentenceType match {
-          case SentenceType.CLAIM.index => (acc._1 :+ x._1, acc._2 :+ x._2)
+          case SentenceType.CLAIM.index => x._2 > 0.95 match {
+            case true => (acc._1 :+ x._1, acc._2 :+ x._2)
+            case _ => acc
+          } 
           case _ => acc
         }
       }
