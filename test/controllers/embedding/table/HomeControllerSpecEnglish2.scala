@@ -82,7 +82,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
   override implicit def defaultAwaitTimeout: Timeout = 600.seconds
 
   val controller: HomeController = inject[HomeController]
-  val sentenceA = "There is evidence data."
+  val sentenceA = "There is evidentiary data that decisively determines the outcome."
   val referenceA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table1.xlsx")
   //  originalUrlOrReference = "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000001086170&fileKind=0")
@@ -110,7 +110,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
   val tableReferenceD = TableReference(referenceD, skipHeaderRows=2, skipRowList=List(),multiHeaderRows=1, sheetNameForExcel= "")  
   val knowledgeForTableD = KnowledgeForTable(getUUID(), tableReferenceD)  
 
-  val paraphraseA = "There is evidence sample."
+  val paraphraseA = "There is evidentiary sample that decisively determines the outcome."
   val referenceParaA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table1.xlsx")
   //  originalUrlOrReference = "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000001086170&fileKind=0")  
@@ -136,7 +136,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table4.xlsx")
   //  originalUrlOrReference = "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032117292&fileKind=0")
   val tableReferenceParaD = TableReference(referenceParaD, skipHeaderRows=2, skipRowList=List(),multiHeaderRows=1, sheetNameForExcel= "")
-  val knowledgeForTableParaD = KnowledgeForTable(getUUID(), tableReferenceParaD)    
+  val knowledgeForTableParaD = KnowledgeForTable(getUUID(), tableReferenceParaD)   
  
 
   val lang = "en_US"
