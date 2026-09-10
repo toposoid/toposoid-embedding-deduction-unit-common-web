@@ -81,7 +81,7 @@ class HomeControllerSpecJapanese2 extends PlaySpec with BeforeAndAfter with Befo
   override implicit def defaultAwaitTimeout: Timeout = 600.seconds
 
   val controller: HomeController = inject[HomeController]
-  val sentenceA = "証拠データが一つあります。"
+  val sentenceA = "決定的に勝敗を左右する証拠データがあリます。"
   val referenceA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table1.xlsx")
   //  originalUrlOrReference = "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000001086170&fileKind=0")
@@ -109,7 +109,7 @@ class HomeControllerSpecJapanese2 extends PlaySpec with BeforeAndAfter with Befo
   val tableReferenceD = TableReference(referenceD, skipHeaderRows=2, skipRowList=List(),multiHeaderRows=1, sheetNameForExcel= "")  
   val knowledgeForTableD = KnowledgeForTable(getUUID(), tableReferenceD)  
 
-  val paraphraseA = "証拠サンプルが一つあります。"
+  val paraphraseA = "決定的に勝敗を左右する証拠サンプルがあリます。"
   val referenceParaA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table1.xlsx")
   //  originalUrlOrReference = "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000001086170&fileKind=0")  
@@ -135,7 +135,7 @@ class HomeControllerSpecJapanese2 extends PlaySpec with BeforeAndAfter with Befo
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table4.xlsx")
   //  originalUrlOrReference = "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000032117292&fileKind=0")
   val tableReferenceParaD = TableReference(referenceParaD, skipHeaderRows=2, skipRowList=List(),multiHeaderRows=1, sheetNameForExcel= "")
-  val knowledgeForTableParaD = KnowledgeForTable(getUUID(), tableReferenceParaD)    
+  val knowledgeForTableParaD = KnowledgeForTable(getUUID(), tableReferenceParaD)     
 
   val lang = "ja_JP"
 
