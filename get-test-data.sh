@@ -1,3 +1,4 @@
+#!/bin/bash
 curl -X GET http://images.cocodataset.org/val2017/000000039769.jpg -o /app/toposoid-embedding-deduction-unit-common-web/test/data/images/test_image1.jpg
 curl -X GET http://images.cocodataset.org/train2017/000000428746.jpg -o /app/toposoid-embedding-deduction-unit-common-web/test/data/images/test_image2.jpg
 curl -X GET https://farm8.staticflickr.com/7103/7210629614_5a388d9a9c_z.jpg -o /app/toposoid-embedding-deduction-unit-common-web/test/data/images/test_image3.jpg
