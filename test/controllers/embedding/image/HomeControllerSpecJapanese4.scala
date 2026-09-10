@@ -23,8 +23,8 @@ import com.ideal.linked.toposoid.common.{SentenceType, TRANSVERSAL_STATE, Toposo
 import com.ideal.linked.toposoid.knowledgebase.regist.model.{PropositionRelation, Reference}
 import com.ideal.linked.toposoid.protocol.model.base.AnalyzedSentenceObjects
 import com.ideal.linked.toposoid.protocol.model.parser.{InputSentenceForParser, KnowledgeForParser, KnowledgeSentenceSetForParser}
-import com.ideal.linked.toposoid.test.utils.TestUtils
-import controllers.TestUtilsEx._
+import com.ideal.linked.toposoid.test.utils.TestUtils.{uploadImage, getAnalyzedSentenceObjectsJsonForSemiGlobal, registerData, setDeductionUnitEndPoints}
+import controllers.TestUtilsEx.{getUUID, registerSingleClaim, deleteNeo4JAllData}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -39,9 +39,13 @@ import com.ideal.linked.toposoid.common.ActionModeType
 import com.ideal.linked.toposoid.protocol.model.frontend.Endpoint
 import com.ideal.linked.toposoid.common.InMemoryDbUtils
 import controllers.TestUtilsEx
-import controllers.ImageBoxInfo
+//import controllers.ImageBoxInfo
 import controllers.HomeController
 import com.ideal.linked.toposoid.common.DeductionPhaseType
+import com.ideal.linked.toposoid.knowledgebase.regist.model.ImageReference
+import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForImage
+import com.ideal.linked.toposoid.knowledgebase.regist.model.Knowledge
+
 
 class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with BeforeAndAfterAll with GuiceOneAppPerSuite with DefaultAwaitTimeout with Injecting {
 
@@ -49,7 +53,7 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
   val transversalStateJson:String = Json.toJson(transversalState).toString()
 
   before {
-    TestUtilsEx.deleteNeo4JAllData(transversalState)
+    deleteNeo4JAllData(transversalState)
     ToposoidUtils.callComponent("{}", conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "createSchema", transversalState)
     ToposoidUtils.callComponent("{}", conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "createSchema", transversalState)
     Thread.sleep(1000)
@@ -65,57 +69,72 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
     }.toSeq
     InMemoryDbUtils.setEmbedingDeducitonUnitEndPoints(endPoints, transversalState)    
     */
-    TestUtils.setDeductionUnitEndPoints(DeductionPhaseType.DEDUCTION_SENTENCE_BASE, transversalState, selectIndice = List(0,1))
-    TestUtilsEx.deleteNeo4JAllData(transversalState)
+    setDeductionUnitEndPoints(DeductionPhaseType.DEDUCTION_SENTENCE_BASE, transversalState, selectIndice = List(0,1))
+    deleteNeo4JAllData(transversalState)
   }
 
   override def afterAll(): Unit = {
-    TestUtilsEx.deleteNeo4JAllData(transversalState)
+    deleteNeo4JAllData(transversalState)
   }
 
   override implicit def defaultAwaitTimeout: Timeout = 600.seconds
 
   val controller: HomeController = inject[HomeController]
-
   val sentenceA = "猫が２匹寝てます。"
-  val referenceA = Reference(url = "", surface = "猫が", surfaceIndex = 0, isWholeSentence = true,
+  val referenceA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/val2017/000000039769.jpg")
-  val imageBoxInfoA = ImageBoxInfo(x =11 , y = 11, weight = 466, height = 310)
+  val imageReferenceA = ImageReference(referenceA, x = 11, y = 11, width = 466, height = 310)
+  val knowledgeForImageA = KnowledgeForImage(getUUID(), imageReferenceA)          
+  //val imageBoxInfoA = ImageBoxInfo(x =11 , y = 11, weight = 466, height = 310)
 
   val sentenceB = "犬が１匹います。"
-  val referenceB = Reference(url = "", surface = "犬が", surfaceIndex = 0, isWholeSentence = true,
+  val referenceB = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/train2017/000000428746.jpg")
-  val imageBoxInfoB = ImageBoxInfo(x = 77, y = 98, weight = 433, height = 222)
+  val imageReferenceB = ImageReference(referenceB, x = 77, y = 98, width = 433, height = 222)
+  val knowledgeForImageB = KnowledgeForImage(getUUID(), imageReferenceB)      
+  //val imageBoxInfoB = ImageBoxInfo(x = 77, y = 98, weight = 433, height = 222)
 
   val sentenceC = "トラックが一台止まっています。"
-  val referenceC = Reference(url = "", surface = "トラックが", surfaceIndex = 0, isWholeSentence = true,
+  val referenceC = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "https://farm8.staticflickr.com/7103/7210629614_5a388d9a9c_z.jpg")
-  val imageBoxInfoC = ImageBoxInfo(x = 23, y = 25, weight = 601, height = 341)
+  val imageReferenceC = ImageReference(referenceC, x = 23, y = 25, width = 601, height = 341)
+  val knowledgeForImageC = KnowledgeForImage(getUUID(), imageReferenceC)        
+  //val imageBoxInfoC = ImageBoxInfo(x = 23, y = 25, weight = 601, height = 341)
 
   val sentenceD = "軍用機が2機飛んでいます。"
-  val referenceD = Reference(url = "", surface = "軍用機が", surfaceIndex = 0, isWholeSentence = true,
+  val referenceD = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "https://farm2.staticflickr.com/1070/5110702674_350f5b367d_z.jpg")
-  val imageBoxInfoD = ImageBoxInfo(x = 223, y = 108, weight = 140, height = 205)
+  val imageReferenceD = ImageReference(referenceD, x = 223, y = 108, width = 140, height = 205)
+  val knowledgeForImageD = KnowledgeForImage(getUUID(), imageReferenceD)      
+  //val imageBoxInfoD = ImageBoxInfo(x = 223, y = 108, weight = 140, height = 205)
 
   val paraphraseA = "ペットが２匹寝てます。"
-  val referenceParaA = Reference(url = "", surface = "ペットが", surfaceIndex = 0, isWholeSentence = true,
+  val referenceParaA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/val2017/000000039769.jpg")
-  val imageBoxInfoParaA = ImageBoxInfo(x =11 , y = 11, weight = 466, height = 310)
+  val imageReferenceParaA = ImageReference(referenceParaA, x = 11, y = 11, width = 466, height = 310)
+  val knowledgeForImageParaA = KnowledgeForImage(getUUID(), imageReferenceParaA)  
+  //val imageBoxInfoParaA = ImageBoxInfo(x =11 , y = 11, weight = 466, height = 310)
 
-  val paraphraseB = "犬が１匹います。"
-  val referenceParaB = Reference(url = "", surface = "動物が", surfaceIndex = 0, isWholeSentence = true,
+  val paraphraseB = "動物が１匹います。"
+  val referenceParaB = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/train2017/000000428746.jpg")
-  val imageBoxInfoParaB = ImageBoxInfo(x = 77, y = 98, weight = 433, height = 222)
+  val imageReferenceParaB = ImageReference(referenceParaB, x = 77, y = 98, width = 433, height = 222)
+  val knowledgeForImageParaB = KnowledgeForImage(getUUID(), imageReferenceParaB)  
+  //val imageBoxInfoParaB = ImageBoxInfo(x = 77, y = 98, weight = 433, height = 222)
 
   val paraphraseC = "トレーラーが一台止まっています。"
-  val referenceParaC = Reference(url = "", surface = "トレーラーが", surfaceIndex = 0, isWholeSentence = true,
+  val referenceParaC = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "https://farm8.staticflickr.com/7103/7210629614_5a388d9a9c_z.jpg")
-  val imageBoxInfoParaC = ImageBoxInfo(x = 23, y = 25, weight = 601, height = 341)
+  val imageReferenceParaC = ImageReference(referenceParaC, x = 23, y = 25, width = 601, height = 341)
+  val knowledgeForImageParaC = KnowledgeForImage(getUUID(), imageReferenceParaC)    
+  //val imageBoxInfoParaC = ImageBoxInfo(x = 23, y = 25, weight = 601, height = 341)
 
   val paraphraseD = "飛行機が2機飛んでいます。"
-  val referenceParaD = Reference(url = "", surface = "飛行機が", surfaceIndex = 0, isWholeSentence = true,
+  val referenceParaD = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "https://farm2.staticflickr.com/1070/5110702674_350f5b367d_z.jpg")
-  val imageBoxInfoParaD = ImageBoxInfo(x = 223, y = 108, weight = 140, height = 205)
+  val imageReferenceParaD = ImageReference(referenceParaD, x = 223, y = 108, width = 140, height = 205)
+  val knowledgeForImageParaD = KnowledgeForImage(getUUID(), imageReferenceParaD)   
+  //val imageBoxInfoParaD = ImageBoxInfo(x = 223, y = 108, weight = 140, height = 205)
 
   val lang = "ja_JP"
 
@@ -125,24 +144,24 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val propositionId2 = getUUID()
       val sentenceId1 = getUUID()
       val sentenceId2 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2 = getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      //val knowledge3 =  getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      //val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      //val knowledge3 =  Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      //val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
       registerSingleClaim(KnowledgeForParser(propositionId2, sentenceId2, knowledge2), transversalState)
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -163,15 +182,15 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val propositionId2 = getUUID()
       val sentenceId1 = getUUID()
       val sentenceId2 = getUUID()
-      //val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      //val knowledge2 =  getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 =  getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      //val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      //val knowledge2 =  Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 =  Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge3), transversalState)
       registerSingleClaim(KnowledgeForParser(propositionId2, sentenceId2, knowledge4), transversalState)
@@ -179,8 +198,8 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -200,15 +219,15 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val propositionId1 = getUUID()
       val sentenceId1 = getUUID()
       val sentenceId2 = getUUID()
-      val  knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      //val knowledge2 =  getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 =  getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      //val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val  knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      //val knowledge2 =  Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 =  Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      //val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId1, sentenceId1, knowledge1)),
@@ -216,14 +235,14 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
         List(KnowledgeForParser(propositionId1, sentenceId2, knowledge3)),
         List.empty[PropositionRelation]
       )
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
 
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -244,28 +263,28 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId1 = getUUID()
       val sentenceId2 = getUUID()
       val sentenceId3 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2 =  getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 =  getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      //val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 =  Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 =  Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      //val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), KnowledgeForParser(propositionId1, sentenceId2, knowledge2)),
         List(PropositionRelation("AND", 0,1)),
         List(KnowledgeForParser(propositionId1, sentenceId3, knowledge3)),
         List.empty[PropositionRelation])
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -286,28 +305,28 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId1 = getUUID()
       val sentenceId2 = getUUID()
       val sentenceId3 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      //val knowledge2 =  getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 =  getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      //val knowledge2 =  Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 =  Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId1, sentenceId1, knowledge1)),
         List.empty[PropositionRelation],
         List(KnowledgeForParser(propositionId1, sentenceId2, knowledge3), KnowledgeForParser(propositionId1, sentenceId3, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -329,27 +348,27 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId2 = getUUID()
       val sentenceId3 = getUUID()
       val sentenceId4 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2 =  getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 =  getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 =  Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 =  Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), KnowledgeForParser(propositionId1, sentenceId2, knowledge2)),
         List(PropositionRelation("AND", 0,1)),
         List(KnowledgeForParser(propositionId1, sentenceId3, knowledge3), KnowledgeForParser(propositionId1, sentenceId4, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -375,37 +394,37 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId4 = getUUID()
       val sentenceId5 = getUUID()
       val sentenceId6 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2 = getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 = getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
       registerSingleClaim(KnowledgeForParser(propositionId2, sentenceId2, knowledge2), transversalState)
 
-      val knowledge1a = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2a = getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
+      val knowledge1a = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2a = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
 
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId3, sentenceId3, knowledge1a), KnowledgeForParser(propositionId3, sentenceId4, knowledge2a)),
         List(PropositionRelation("AND", 0,1)),
         List(KnowledgeForParser(propositionId3, sentenceId5, knowledge3), KnowledgeForParser(propositionId3, sentenceId6, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
       Thread.sleep(5000)
 
 
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -432,15 +451,15 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId4 = getUUID()
       val sentenceId5 = getUUID()
       val sentenceId6 = getUUID()
-      val knowledge1 = getKnowledge(lang = lang, sentence = sentenceA, reference = referenceA, imageBoxInfo = imageBoxInfoA, transversalState)
-      val knowledge2 = getKnowledge(lang = lang, sentence = sentenceB, reference = referenceB, imageBoxInfo = imageBoxInfoB, transversalState)
-      val knowledge3 = getKnowledge(lang = lang, sentence = sentenceC, reference = referenceC, imageBoxInfo = imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang = lang, sentence = sentenceD, reference = referenceD, imageBoxInfo = imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang = lang, sentence = paraphraseA, reference = referenceParaA, imageBoxInfo = imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang = lang, sentence = paraphraseB, reference = referenceParaB, imageBoxInfo = imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang = lang, sentence = paraphraseC, reference = referenceParaC, imageBoxInfo = imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang = lang, sentence = paraphraseD, reference = referenceParaD, imageBoxInfo = imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
       registerSingleClaim(KnowledgeForParser(propositionId2, sentenceId2, knowledge2), transversalState)
@@ -450,9 +469,9 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -476,32 +495,32 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId3 = getUUID()
       val sentenceId4 = getUUID()
       val sentenceId5 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2 =  getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 =  getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 =  Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 =  Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
-      val knowledge1a = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
+      val knowledge1a = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId2, sentenceId2, knowledge1a), KnowledgeForParser(propositionId2, sentenceId3, knowledge2)),
         List(PropositionRelation("AND", 0,1)),
         List(KnowledgeForParser(propositionId2, sentenceId4, knowledge3), KnowledgeForParser(propositionId2, sentenceId5, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
       Thread.sleep(5000)
 
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -525,33 +544,33 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId3 = getUUID()
       val sentenceId4 = getUUID()
       val sentenceId5 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2 = getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 = getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge3), transversalState)
 
-      val knowledge3a = getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
+      val knowledge3a = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId2, sentenceId2, knowledge1), KnowledgeForParser(propositionId2, sentenceId3, knowledge2)),
         List(PropositionRelation("AND", 0,1)),
         List(KnowledgeForParser(propositionId2, sentenceId4, knowledge3a), KnowledgeForParser(propositionId2, sentenceId5, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
       Thread.sleep(5000)
 
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
 
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -577,35 +596,35 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       val sentenceId4 = getUUID()
       val sentenceId5 = getUUID()
       val sentenceId6 = getUUID()
-      val knowledge1 = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge2 = getKnowledge(lang=lang, sentence=sentenceB, reference=referenceB, imageBoxInfo=imageBoxInfoB, transversalState)
-      val knowledge3 = getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
-      val knowledge4 = getKnowledge(lang=lang, sentence=sentenceD, reference=referenceD, imageBoxInfo=imageBoxInfoD, transversalState)
+      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
+      val knowledge3 = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
+      val knowledge4 = Knowledge(lang=lang, sentence=sentenceD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageD, transversalState)))
 
-      val paraphrase1 = getKnowledge(lang=lang, sentence=paraphraseA, reference=referenceParaA, imageBoxInfo=imageBoxInfoParaA, transversalState)
-      val paraphrase2 = getKnowledge(lang=lang, sentence=paraphraseB, reference=referenceParaB, imageBoxInfo=imageBoxInfoParaB, transversalState)
-      val paraphrase3 = getKnowledge(lang=lang, sentence=paraphraseC, reference=referenceParaC, imageBoxInfo=imageBoxInfoParaC, transversalState)
-      val paraphrase4 = getKnowledge(lang=lang, sentence=paraphraseD, reference=referenceParaD, imageBoxInfo=imageBoxInfoParaD, transversalState)
+      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
+      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
+      val paraphrase4 = Knowledge(lang=lang, sentence=paraphraseD, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaD, transversalState)))
 
       registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
       registerSingleClaim(KnowledgeForParser(propositionId2, sentenceId2, knowledge3), transversalState)
 
-      val knowledge1a = getKnowledge(lang=lang, sentence=sentenceA, reference=referenceA, imageBoxInfo=imageBoxInfoA, transversalState)
-      val knowledge3a = getKnowledge(lang=lang, sentence=sentenceC, reference=referenceC, imageBoxInfo=imageBoxInfoC, transversalState)
+      val knowledge1a = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
+      val knowledge3a = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
 
       val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
         List(KnowledgeForParser(propositionId3, sentenceId3, knowledge1a), KnowledgeForParser(propositionId3, sentenceId4, knowledge2)),
         List(PropositionRelation("AND", 0,1)),
         List(KnowledgeForParser(propositionId3, sentenceId5, knowledge3a), KnowledgeForParser(propositionId3, sentenceId6, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
-      TestUtils.registerData(knowledgeSentenceSetForParser, transversalState)
+      registerData(knowledgeSentenceSetForParser, transversalState)
       Thread.sleep(5000)
 
       val propositionIdForInference = getUUID()
       val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
       val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase4))
-      val inputSentence = Json.toJson(InputSentenceForParser(premiseKnowledge, claimKnowledge,  ActionModeType.DEDUCTION_MODE.index)).toString()
-      val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, List(getImageInfo(referenceParaA, imageBoxInfoParaA, transversalState), getImageInfo(referenceParaB, imageBoxInfoParaB, transversalState), getImageInfo(referenceParaC, imageBoxInfoParaC, transversalState), getImageInfo(referenceParaD, imageBoxInfoParaD, transversalState)), transversalState)
+      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
+      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))

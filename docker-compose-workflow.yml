@@ -1,15 +1,16 @@
 version: '3'
 services:
   toposoid-embedding-deduction-unit-common-web:
-    image: toposoid-embedding-deduction-unit-common-web:0.7-SNAPSHOT
+    image: toposoid/toposoid-embedding-deduction-unit-common-web:0.7-SNAPSHOT
     tty: true
     environment:
       - PRIVATE_IP_ADDRESS=toposoid-embedding-deduction-unit-common-web
       - TOPOSOID_GRAPHDB_WEB_HOST=data-accessor-neo4j-web
       - TOPOSOID_GRAPHDB_WEB_PORT=9005
-      - TOPOSOID_EMBEDDING_DEDUCTION_UNITS=["toposoid-deduction-unit-sentence-vector-match-web", "toposoid-deduction-unit-whole-sentence-image-match-web"]
-      - TOPOSOID_EMBEDDING_DEDUCTION_PORTS=["9103", "9105"]
-      - TOPOSOID_EMBEDDING_DEDUCTION_NAMES=["EmbeddingSentenceMatch", "EmbeddingWholeSentenceImageMatch"]
+      - TOPOSOID_EMBEDDING_DEDUCTION_UNITS=["toposoid-deduction-unit-sentence-vector-match-web", "toposoid-deduction-unit-whole-sentence-image-match-web", "toposoid-deduction-unit-whole-sentence-table-match-web"]
+      - TOPOSOID_EMBEDDING_DEDUCTION_PORTS=["9103", "9105", "9106"]
+      - TOPOSOID_EMBEDDING_DEDUCTION_NAMES=["EmbeddingSentenceMatch", "EmbeddingWholeSentenceImageMatch", "EmbeddingWholeSentenceTableMatch"]
+      - TOPOSOID_EMBEDDING_DEDUCTION_PREMISE_MATCH_THRESHOLD=0.95
       - TOPOSOID_SENTENCE_PARSER_JP_WEB_HOST=toposoid-sentence-parser-japanese-web
       - TOPOSOID_SENTENCE_PARSER_JP_WEB_PORT=9001
       - TOPOSOID_SENTENCE_PARSER_EN_WEB_HOST=toposoid-sentence-parser-english-web
@@ -24,15 +25,57 @@ services:
       - TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST=data-accessor-image-weaviate-web
       - TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT=9011
       - TOPOSOID_IMAGE_VECTORDB_SEARCH_NUM_MAX=5
+      - TOPOSOID_TABLE_VECTORDB_ACCESSOR_HOST=data-accessor-table-weaviate-web
+      - TOPOSOID_TABLE_VECTORDB_ACCESSOR_PORT=9011 #Docker Container to Docker Container Access
+      - TOPOSOID_TABLE_VECTORDB_SEARCH_NUM_MAX=5
       - TOPOSOID_COMMON_IMAGE_RECOGNITION_HOST=toposoid-common-image-recognition-web
       - TOPOSOID_COMMON_IMAGE_RECOGNITION_PORT=9013
+      - TOPOSOID_COMMON_TABLE_RECOGNITION_HOST=toposoid-common-table-recognition-web
+      - TOPOSOID_COMMON_TABLE_RECOGNITION_PORT=9019
       - TOPOSOID_CONTENTS_ADMIN_HOST=toposoid-contents-admin-web
       - TOPOSOID_CONTENTS_ADMIN_PORT=9012
       - TOPOSOID_IN_MEMORY_DB_WEB_HOST=data-accessor-redis-web
       - TOPOSOID_IN_MEMORY_DB_WEB_PORT=9015
+      - TOPOSOID_FILE_UPLOAD_FACADE_HOST=toposoid-file-upload-facade-web
+      - TOPOSOID_FILE_UPLOAD_FACADE_PORT=9024      
       - PLAY_HTTP_PORT=9202
     ports:
       - 9202:9202
+    depends_on:
+      - toposoid-deduction-unit-sentence-vector-match-web
+      - toposoid-deduction-unit-whole-sentence-image-match-web
+      - toposoid-deduction-unit-whole-sentence-table-match-web
+      - data-accessor-redis-web
+      - data-accessor-neo4j-web
+
+  toposoid-deduction-unit-whole-sentence-table-match-web:
+    image: toposoid/toposoid-deduction-unit-whole-sentence-table-match-web:0.7-SNAPSHOT
+    environment:
+      - PRIVATE_IP_ADDRESS=toposoid-deduction-unit-whole-sentence-table-match-web
+      - TOPOSOID_GRAPHDB_WEB_HOST=data-accessor-neo4j-web
+      - TOPOSOID_GRAPHDB_WEB_PORT=9005
+      - TOPOSOID_SENTENCE_PARSER_JP_WEB_HOST=toposoid-sentence-parser-japanese-web
+      - TOPOSOID_SENTENCE_PARSER_JP_WEB_PORT=9001
+      - TOPOSOID_SENTENCE_PARSER_EN_WEB_HOST=toposoid-sentence-parser-english-web
+      - TOPOSOID_SENTENCE_PARSER_EN_WEB_PORT=9007
+      - TOPOSOID_COMMON_NLP_JP_WEB_HOST=toposoid-common-nlp-japanese-web
+      - TOPOSOID_COMMON_NLP_JP_WEB_PORT=9006
+      - TOPOSOID_COMMON_NLP_EN_WEB_HOST=toposoid-common-nlp-english-web
+      - TOPOSOID_COMMON_NLP_EN_WEB_PORT=9008
+      - TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST=data-accessor-sentence-weaviate-web
+      - TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT=9011
+      - TOPOSOID_SENTENCE_VECTORDB_SEARCH_NUM_MAX=5
+      - TOPOSOID_TABLE_VECTORDB_ACCESSOR_HOST=data-accessor-table-weaviate-web
+      - TOPOSOID_TABLE_VECTORDB_ACCESSOR_PORT=9011 #Docker Container to Docker Container Access
+      - TOPOSOID_TABLE_VECTORDB_SEARCH_NUM_MAX=5
+      - TOPOSOID_COMMON_TABLE_RECOGNITION_HOST=toposoid-common-table-recognition-web
+      - TOPOSOID_COMMON_TABLE_RECOGNITION_PORT=9019
+      - PLAY_HTTP_PORT=9106
+    ports:
+      - 9106:9106
+    depends_on:
+      - data-accessor-table-weaviate-web
+      - toposoid-common-table-recognition-web
 
   toposoid-deduction-unit-sentence-vector-match-web:
     image: toposoid/toposoid-deduction-unit-sentence-vector-match-web:0.7-SNAPSHOT
@@ -54,6 +97,10 @@ services:
       - PLAY_HTTP_PORT=9103
     ports:
       - 9103:9103
+    depends_on:
+      - data-accessor-sentence-weaviate-web
+      - toposoid-common-nlp-english-web
+      - toposoid-common-nlp-japanese-web
 
   toposoid-deduction-unit-whole-sentence-image-match-web:
     image: toposoid/toposoid-deduction-unit-whole-sentence-image-match-web:0.7-SNAPSHOT
@@ -82,6 +129,9 @@ services:
       - PLAY_HTTP_PORT=9105
     ports:
       - 9105:9105
+    depends_on:
+      - data-accessor-image-weaviate-web
+      - toposoid-common-image-recognition-web
 
   data-accessor-neo4j-web:
     image: toposoid/data-accessor-neo4j-web:0.7-SNAPSHOT
@@ -91,6 +141,9 @@ services:
       - PLAY_HTTP_PORT=9005
     ports:
       - 9005:9005
+    depends_on:
+      - neo4j
+
   toposoid-sentence-parser-japanese-web:
     image: toposoid/toposoid-sentence-parser-japanese-web:0.7-SNAPSHOT
     environment:
@@ -203,12 +256,19 @@ services:
     ports:
       - 9013:9013
 
+  toposoid-common-table-recognition-web:
+    image: toposoid/toposoid-common-table-recognition-web:0.7-SNAPSHOT
+    environment:
+      - TOPOSOID_TABLE_RECOGNITION_MODEL=tabicl 
+    ports:
+      - 9019:9019
+
   data-accessor-sentence-weaviate-web:
     image: toposoid/data-accessor-weaviate-web:0.7-SNAPSHOT
     environment:
       - TOPOSOID_WEAVIATE_HOST=sentence-weaviate
       - TOPOSOID_WEAVIATE_PORT=8080
-      - TOPOSOID_WEAVIATE_SIMILARITY_THRESHOLD=0.87
+      - TOPOSOID_WEAVIATE_SIMILARITY_THRESHOLD=0.89
       - TOPOSOID_DATA_ACCESSOR_PORT=9011
     ports:
       - 9020:9011
@@ -272,3 +332,57 @@ services:
       ENABLE_MODULES: 'text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai'
       CLUSTER_HOSTNAME: 'node1'
 
+  data-accessor-table-weaviate-web:
+    image: toposoid/data-accessor-weaviate-web:0.7-SNAPSHOT
+    environment:
+      - TOPOSOID_WEAVIATE_HOST=table-weaviate
+      - TOPOSOID_WEAVIATE_PORT=8083
+      - TOPOSOID_WEAVIATE_SIMILARITY_THRESHOLD=0.98
+      - TOPOSOID_DATA_ACCESSOR_PORT=9011
+    ports:
+      - 9023:9011
+    depends_on:
+      - table-weaviate
+
+  table-weaviate:
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - '8083'
+      - --scheme
+      - http
+    image: cr.weaviate.io/semitechnologies/weaviate:1.26.3
+    ports:
+      - 8083:8083
+    #volumes:
+    #  - /var/weaviate:/var/lib/weaviate
+    restart: on-failure:0
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'text2vec-huggingface'
+      HUGGINGFACE_APIKEY: ''
+      ENABLE_MODULES: 'text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai'
+      CLUSTER_HOSTNAME: 'node1'
+
+  toposoid-file-upload-facade-web:
+    image: toposoid/toposoid-file-upload-facade-web:0.7-SNAPSHOT
+    environment:
+      - TOPOSOID_CONTENTS_URL=http://toposoid-contents-admin-web:9012/contents/
+      - TOPOSOID_CONTENTS_ADMIN_HOST=toposoid-contents-admin-web
+      - TOPOSOID_CONTENTS_ADMIN_PORT=9012      
+      - TOPOSOID_FILESCAN_HOST=clamav   
+      - TOPOSOID_FILESCAN_PORT=3310
+    ports:
+      - 9024:9024
+    depends_on:
+      - clamav
+
+  clamav:
+    image: clamav/clamav-debian
+    container_name: clamav
+    ports:
+      - "3310:3310" 
+  
