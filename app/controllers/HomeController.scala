@@ -196,7 +196,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     val (ids, similarities) = (result.ids zip result.similarities).foldLeft((List.empty[FeatureVectorIdentifier], List.empty[Float])) {
       (acc, x) => {
         x._1.sentenceType match {
-          case SentenceType.CLAIM.index => x._2 > 0.95 match {
+          case SentenceType.CLAIM.index => x._2 > conf.getDouble("TOPOSOID_EMBEDDING_DEDUCTION_PREMISE_MATCH_THRESHOLD") match {
             case true => (acc._1 :+ x._1, acc._2 :+ x._2)
             case _ => acc
           } 
