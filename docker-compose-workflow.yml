@@ -1,7 +1,7 @@
 version: '3'
 services:
   toposoid-embedding-deduction-unit-common-web:
-    image: toposoid/toposoid-embedding-deduction-unit-common-web:0.7-SNAPSHOT
+    image: toposoid-embedding-deduction-unit-common-web:0.7-SNAPSHOT
     tty: true
     environment:
       - PRIVATE_IP_ADDRESS=toposoid-embedding-deduction-unit-common-web
