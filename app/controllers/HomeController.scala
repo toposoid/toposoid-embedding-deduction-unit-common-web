@@ -144,7 +144,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
 
   private def getCoveredKnowledgeBaseSideInfo(extractedKnowledgeBaseSideInfo:List[KnowledgeBaseSideInfo], aso: AnalyzedSentenceObject,  transversalState:TransversalState) :List[KnowledgeBaseSideInfo]  ={
     //TODO:ここはFilterではうまく行かない。Premiseを立証するClaimの情報が追加されないといけない！！！
-    extractedKnowledgeBaseSideInfo.foldLeft(List.empty[KnowledgeBaseSideInfo]){
+    checkOtherRelation(extractedKnowledgeBaseSideInfo, transversalState).foldLeft(List.empty[KnowledgeBaseSideInfo]){
       (acc, x) => {
         if (havePremise(x, transversalState)) {
           acc ::: checkClaimHavingPremise(x, transversalState)
@@ -153,6 +153,41 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
         }
       }
     }.distinct 
+  }
+
+  private def checkOtherRelation(extractedKnowledgeBaseSideInfo: List[KnowledgeBaseSideInfo], transversalState:TransversalState): List[KnowledgeBaseSideInfo] = {
+    //すでに各DeductionUnitで、Claim側にsentenceが存在していることが保証されている。
+    //そのSentenceのリレーションも調べて、自明に真と確定できるものをさらに抽出。
+    //まず単徳の主張だけで真と言えるものを優先する。
+    val neo4jUtils = Neo4JUtilsImpl()
+    val candidates1 = extractedKnowledgeBaseSideInfo.filter(x => {
+      val query = "MATCH (n:SemiGlobalClaimNode) - [e:SemiGlobalEdge] - (m:SemiGlobalClaimNode) WHERE n.sentenceId ='%s'  RETURN n, e, m".format(x.sentenceId)
+      val jsonStr: String = neo4jUtils.getCypherQueryResult(query, "n", transversalState)
+      val neo4jRecords: Neo4jRecords = Json.parse(jsonStr).as[Neo4jRecords]
+      neo4jRecords.records.size match {
+        case 0 => true //すでにClaimとしてsentenceが存在していて、リレーションがないのでこれがあればそれを優先する。
+        case _ => false
+      }
+    })    
+    candidates1.size > 0 match {
+      case true => candidates1
+      case _ => {
+        val candidates2 = extractedKnowledgeBaseSideInfo.filter(x => {
+          //PropositionIdを指定して、ClaimNodeだけを選択　ORのリレーションが全くないものは自明にTrue
+          val query = "MATCH (n:SemiGlobalClaimNode) - [e:SemiGlobalEdge] - (m:SemiGlobalClaimNode) WHERE n.propositionId ='%s' AND e.logicType='OR' RETURN n, e, m".format(x.propositionId)
+          val jsonStr: String = neo4jUtils.getCypherQueryResult(query, "e", transversalState)
+          val neo4jRecords: Neo4jRecords = Json.parse(jsonStr).as[Neo4jRecords]
+          neo4jRecords.records.size match {
+            case 0 => true //すでにClaimとしてsentenceが存在していて、リレーションがANDしかないのでこれがあればそれを優先する。
+            case _ => false
+          }
+        })
+        candidates2.size > 0 match {
+          case true => candidates2
+          case _ => List.empty[KnowledgeBaseSideInfo] //ORのリレーションがある場合は、真偽が自明にならない。
+        }
+      }
+    }
   }
 
 
@@ -272,7 +307,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     if (claimMatchedPropositionInfo.size < neo4jRecords.records.size) return List.empty[KnowledgeBaseSideInfo]
 
     //val candidates: List[MatchedPropositionInfo] = claimMatchedPropositionInfo.groupBy(identity).mapValues(_.size).map(_._1).toList
-    val candidates: List[KnowledgeBaseSideInfo] = claimMatchedPropositionInfo.distinct
+    val candidates: List[KnowledgeBaseSideInfo] = checkOtherRelation(claimMatchedPropositionInfo.distinct, transversalState) //対象Claimのリレーションもチェック
     //candidatesは、propositionId上の重複はない。
     if (candidates.size == 0) return List.empty[KnowledgeBaseSideInfo]
     //ensure there are no Premise. only claim!
