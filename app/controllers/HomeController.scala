@@ -135,12 +135,31 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     if(extractedKnowledgeBaseSideInfo.size == 0) return aso
     val updatedKnowledgeBaseSideInfo = getCoveredKnowledgeBaseSideInfo(extractedKnowledgeBaseSideInfo, aso, transversalState)
     if(updatedKnowledgeBaseSideInfo.size == 0) return aso
-    val status = true
-    val deductionResult: DeductionResult = new DeductionResult(status,AuthenticityType.TRUE.index, unsettledCoveredPropositionEdges, updatedKnowledgeBaseSideInfo)
+    val authenticityType = getAuthenticityType(updatedKnowledgeBaseSideInfo)
+    val status = authenticityType match {
+      case AuthenticityType.SUPPORTED => true
+      case AuthenticityType.REFUTED => true
+      case _ => false
+    }
+    val deductionResult: DeductionResult = new DeductionResult(status,authenticityType.index, unsettledCoveredPropositionEdges, updatedKnowledgeBaseSideInfo)
     AnalyzedSentenceObject(aso.nodeMap, aso.edgeList, aso.knowledgeBaseSemiGlobalNode, deductionResult)
 
   }
 
+  private def getAuthenticityType(knowledgeBaseSideInfoList:List[KnowledgeBaseSideInfo]): AuthenticityType = {
+    if(knowledgeBaseSideInfoList.size == 0) return AuthenticityType.INSUFFICIENT
+    val refutedKnowledges =knowledgeBaseSideInfoList.filter(x => x.isNegativeMeaning)
+    refutedKnowledges.size match {
+      case 0 => AuthenticityType.SUPPORTED
+      case _ => {
+        if(refutedKnowledges.size == knowledgeBaseSideInfoList.size){
+          AuthenticityType.REFUTED
+        }else{
+          AuthenticityType.CONFLICTING
+        }
+      }   
+    }
+  }
 
   private def getCoveredKnowledgeBaseSideInfo(extractedKnowledgeBaseSideInfo:List[KnowledgeBaseSideInfo], aso: AnalyzedSentenceObject,  transversalState:TransversalState) :List[KnowledgeBaseSideInfo]  ={
     //TODO:ここはFilterではうまく行かない。Premiseを立証するClaimの情報が追加されないといけない！！！
@@ -338,6 +357,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     //if(!haveFeatureTypeToProcess(aso, deductionUnitFeatureTypes)) return aso
     val coveredPropositionEdges = aso.deductionResult.coveredPropositionEdges
     if (coveredPropositionEdges.size == 0) return aso
+    checkFinal(aso, deductionUnitName, coveredPropositionEdges, transversalState)
+    /*
     val result = checkFinal(aso, deductionUnitName, coveredPropositionEdges, transversalState)
     if(!result.deductionResult.status) return result
     //This process requires that the Premise has already finished in calculating the DeductionResult
@@ -381,6 +402,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     } else {
       result
     }
+    */
   }
   
 
