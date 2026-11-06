@@ -106,7 +106,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
               propositionId = y.propositionId,
               sentenceId = y.sentenceId,
               featureInfoList =List(y.featureInfo),
-              deductionUnits = deductionUnits
+              deductionUnits = deductionUnits,
+              isNegativeMeaning = y.isNegativeMeaning       
             )
           })
           acc ::: confirmedKnowledgeBaseSideInfoList
