@@ -23,7 +23,7 @@ import com.ideal.linked.toposoid.knowledgebase.featurevector.model.FeatureVector
 import com.ideal.linked.toposoid.knowledgebase.regist.model.PropositionRelation
 import com.ideal.linked.toposoid.protocol.model.neo4j.Neo4jRecords
 import com.ideal.linked.toposoid.protocol.model.parser.{KnowledgeForParser, KnowledgeSentenceSetForParser}
-import com.ideal.linked.toposoid.test.utils.TestUtils
+import com.ideal.linked.toposoid.test.utils.TestUtils.{uploadImage, uploadTable, getAnalyzedSentenceObjectsJsonForSemiGlobal, registerData}
 import play.api.libs.json.Json
 import com.ideal.linked.toposoid.protocol.model.base.AnalyzedSentenceObjects
 import com.ideal.linked.toposoid.protocol.model.base.AnalyzedSentenceObject
@@ -39,6 +39,9 @@ import com.ideal.linked.toposoid.knowledgebase.regist.model.Reference
 import com.ideal.linked.toposoid.knowledgebase.regist.model.ImageReference
 import com.ideal.linked.toposoid.knowledgebase.regist.model.Knowledge
 import com.ideal.linked.toposoid.protocol.model.frontend.Endpoint
+import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForTable
+import com.ideal.linked.toposoid.protocol.model.parser.InputSentenceForParser
+import com.ideal.linked.toposoid.common.ActionModeType
 
 //case class ImageBoxInfo(x:Int, y:Int, weight:Int, height:Int)
 
@@ -59,7 +62,7 @@ object TestUtilsEx {
       List.empty[PropositionRelation],
       List(knowledgeForParser),
       List.empty[PropositionRelation])
-    TestUtils.registerData(knowledgeSentenceSetForParser, transversalState, addVectorFlag = true)
+    registerData(knowledgeSentenceSetForParser, transversalState, addVectorFlag = true)
     Thread.sleep(5000)
   }
 
@@ -77,5 +80,50 @@ object TestUtilsEx {
     usedUuidList = usedUuidList :+ uuid
     uuid
   }
-  
+
+  def registerKnowledge(
+    lang:String,
+    transversalState:TransversalState,
+    claims:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])], 
+    claimRelations:List[PropositionRelation] = List.empty[PropositionRelation], 
+    premises:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])]=List.empty[(String, List[KnowledgeForImage], List[KnowledgeForTable])], 
+    premiseRelations:List[PropositionRelation] = List.empty[PropositionRelation],
+    addVectorFlag:Boolean = false
+    ):String = {
+    
+    val propositionId = getUUID()
+    val claimKnowledgeForParsers =  claims.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+    val premiseKnowledgeForParsers =  premises.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+
+    val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
+      premiseKnowledgeForParsers,
+      premiseRelations,
+      claimKnowledgeForParsers,
+      claimRelations)
+
+    registerData(knowledgeSentenceSetForParser, transversalState, addVectorFlag=addVectorFlag)
+    propositionId
+
+  }
+
+  def prepairInputJson(
+    lang:String,
+    transversalState:TransversalState,
+    claims:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])], 
+    premises:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])]=List.empty[(String, List[KnowledgeForImage], List[KnowledgeForTable])]
+  ):String = {
+    val propositionId = getUUID()
+    val claimKnowledgeForParsers =  claims.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+    val premiseKnowledgeForParsers =  premises.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+    val inputSentenceForParser = InputSentenceForParser(premiseKnowledgeForParsers, claimKnowledgeForParsers, ActionModeType.DEDUCTION_MODE.index)
+    getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+  }  
 }
