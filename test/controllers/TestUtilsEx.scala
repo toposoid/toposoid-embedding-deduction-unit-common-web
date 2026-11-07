@@ -88,7 +88,7 @@ object TestUtilsEx {
     claimRelations:List[PropositionRelation] = List.empty[PropositionRelation], 
     premises:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])]=List.empty[(String, List[KnowledgeForImage], List[KnowledgeForTable])], 
     premiseRelations:List[PropositionRelation] = List.empty[PropositionRelation],
-    addVectorFlag:Boolean = false
+    addVectorFlag:Boolean = true
     ):String = {
     
     val propositionId = getUUID()
