@@ -149,11 +149,12 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
 
   private def getAuthenticityType(knowledgeBaseSideInfoList:List[KnowledgeBaseSideInfo]): AuthenticityType = {
     if(knowledgeBaseSideInfoList.size == 0) return AuthenticityType.INSUFFICIENT
-    val refutedKnowledges =knowledgeBaseSideInfoList.filter(x => x.isNegativeMeaning)
+    val supportedKnowledges =knowledgeBaseSideInfoList.filter(x => !x.isNegativeMeaning && x.deductionUnits.size > 0) //各dductionUnitで確定したものだけで評価。A→B, A パターンのAは除く。
+    val refutedKnowledges =knowledgeBaseSideInfoList.filter(x => x.isNegativeMeaning && x.deductionUnits.size > 0) //各dductionUnitで確定したものだけで評価。A→B, A パターンのAは除く。
     refutedKnowledges.size match {
       case 0 => AuthenticityType.SUPPORTED
       case _ => {
-        if(refutedKnowledges.size == knowledgeBaseSideInfoList.size){
+        if(supportedKnowledges.size == 0){
           AuthenticityType.REFUTED
         }else{
           AuthenticityType.CONFLICTING

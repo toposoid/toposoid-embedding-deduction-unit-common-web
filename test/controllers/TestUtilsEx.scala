@@ -42,6 +42,10 @@ import com.ideal.linked.toposoid.protocol.model.frontend.Endpoint
 import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForTable
 import com.ideal.linked.toposoid.protocol.model.parser.InputSentenceForParser
 import com.ideal.linked.toposoid.common.ActionModeType
+import com.ideal.linked.toposoid.common.SentenceType
+import com.ideal.linked.toposoid.common.SuperiorType
+import com.ideal.linked.toposoid.common.NonSentenceType
+import com.ideal.linked.toposoid.common.CaseGroupType
 
 //case class ImageBoxInfo(x:Int, y:Int, weight:Int, height:Int)
 
@@ -66,9 +70,15 @@ object TestUtilsEx {
     Thread.sleep(5000)
   }
 
-  def deleteFeatureVector(featureVectorIdentifier: FeatureVectorIdentifier, transversalState:TransversalState): Unit = {
+  def deleteFeatureVector(featureVectorIdentifier: FeatureVectorIdentifier, transversalState:TransversalState): Unit = {    
     val json: String = Json.toJson(featureVectorIdentifier).toString()
     ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "delete", transversalState)
+  }
+
+  def deleteFeatureVectorByPropositionId(propositionId: String, transversalState:TransversalState): Unit = {
+    val featureVectorIdentifier= FeatureVectorIdentifier(superiorId = propositionId, featureId = "dummy", sentenceType = SentenceType.CLAIM.index, lang = "ja_JP", SuperiorType.PROPOSITION_ID.index, NonSentenceType.UNSPECIFIED.index, CaseGroupType.UNSPECIFIED.index)
+    val json: String = Json.toJson(featureVectorIdentifier).toString()
+    ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "deleteBySuperiorId", transversalState)
   }
   var usedUuidList = List.empty[String]
 
