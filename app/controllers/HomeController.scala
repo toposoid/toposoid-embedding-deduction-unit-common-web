@@ -241,7 +241,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     }
   }
 
-  def getMatchedSentenceFeature(originalSentenceId: String, originalSentenceType: Int, sentence: String, lang: String, transversalState:TransversalState): List[KnowledgeBaseSideInfo] = {
+  private def getMatchedSentenceFeature(originalSentenceId: String, originalSentenceType: Int, sentence: String, lang: String, transversalState:TransversalState): List[KnowledgeBaseSideInfo] = {
 
     val vector = FeatureVectorizer.getSentenceVector(Knowledge(sentence, lang, "{}"), transversalState)
     val json: String = Json.toJson(SingleFeatureVectorForSearch(vector = vector.vector, num = conf.getString("TOPOSOID_SENTENCE_VECTORDB_SEARCH_NUM_MAX").toInt)).toString()
@@ -266,7 +266,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
       case 0 => List.empty[KnowledgeBaseSideInfo]
       case _ => {
         //sentenceごとに最も類似度が高いものを抽出する
-        val featureVectorSearchInfoList = extractExistInNeo4JResultForSentence(filteredResult, originalSentenceType, transversalState)
+        val existDenialWord = getExistDenialWord(originalSentenceId, transversalState)
+        val featureVectorSearchInfoList = extractExistInNeo4JResultForSentence(filteredResult, originalSentenceType, FeatureType.SENTENCE, existDenialWord, transversalState)
         featureVectorSearchInfoList.map(x => {          
           //TODO:deductionUnitsを適切にコンストラクタに渡す
           KnowledgeBaseSideInfo(x.propositionId, x.sentenceId, List(MatchedFeatureInfo(featureId = x.sentenceId, FeatureType.SENTENCE.index, similarity = x.similarity)), List.empty[String])
@@ -275,7 +276,16 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     }
   }
   
-  private def extractExistInNeo4JResultForSentence(featureVectorSearchResult: FeatureVectorSearchResult, originalSentenceType: Int, transversalState:TransversalState): List[FeatureVectorSearchInfo] = {
+  private def getExistDenialWord(sentenceId:String, transversalState:TransversalState):Boolean = {
+    val neo4jUtils = Neo4JUtilsImpl()
+    val query = "MATCH (n) WHERE n.sentenceId='%s' AND n.isDenialWord='true' AND (n.caseType='ROOT' OR n.caseType='文末') RETURN n".format(sentenceId)
+    val jsonStr: String = neo4jUtils.getCypherQueryResult(query, "", transversalState)
+    val neo4jRecords: Neo4jRecords = Json.parse(jsonStr).as[Neo4jRecords]
+    neo4jRecords.records.size > 0
+  }
+
+
+  private def extractExistInNeo4JResultForSentence(featureVectorSearchResult: FeatureVectorSearchResult, originalSentenceType: Int, featureType:FeatureType, existDenialWord:Boolean, transversalState:TransversalState): List[FeatureVectorSearchInfo] = {
 
     val neo4jUtils = Neo4JUtilsImpl()
     (featureVectorSearchResult.ids zip featureVectorSearchResult.similarities).foldLeft(List.empty[FeatureVectorSearchInfo]) {
@@ -293,14 +303,36 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
         neo4jRecords.records.size match {
           case 0 => acc
           case _ => {
-            val idInfoOnNeo4jSide = neo4jRecords.records.head.head.value.semiGlobalNode.get
-            //sentenceType returns the originalSentenceType of the argument
-            acc :+ FeatureVectorSearchInfo(idInfoOnNeo4jSide.propositionId, idInfoOnNeo4jSide.sentenceId, originalSentenceType, lang, featureId, similarity)
+            val isNegativeMeaning = checkNegativeMatch(neo4jUtils, featureId, featureType, existDenialWord, transversalState)
+            isNegativeMeaning match {
+              case true =>  acc
+              case _ => {
+                val idInfoOnNeo4jSide = neo4jRecords.records.head.head.value.semiGlobalNode.get
+                //sentenceType returns the originalSentenceType of the argument
+                acc :+ FeatureVectorSearchInfo(idInfoOnNeo4jSide.propositionId, idInfoOnNeo4jSide.sentenceId, originalSentenceType, lang, featureId, similarity)
+              }
+            }
           }
         }
       }
     }
   }
+
+  //SentenceIdごとに文末の否定、肯定の一致があるかチェックする。
+  private def checkNegativeMatch(neo4jUtils:Neo4JUtilsImpl, sentenceId:String, featureType:FeatureType, existDenialWord:Boolean, transversalState:TransversalState): Boolean = {
+      featureType match {
+          case FeatureType.SENTENCE => {
+              val query = "MATCH (n) WHERE n.sentenceId='%s' AND n.isDenialWord='%s' AND (n.caseType='ROOT' OR n.caseType='文末') RETURN n".format(sentenceId, existDenialWord)
+              val jsonStr: String = neo4jUtils.getCypherQueryResult(query, "", transversalState)
+              val neo4jRecords: Neo4jRecords = Json.parse(jsonStr).as[Neo4jRecords]
+              neo4jRecords.records.size == 0
+          }
+          case _ => {
+              false
+          }
+      }
+  }
+
   /**
    *
    * @param neo4jRecords
