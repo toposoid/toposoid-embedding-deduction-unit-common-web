@@ -82,7 +82,7 @@ class HomeControllerSpecJapanese1 extends PlaySpec with BeforeAndAfter with Befo
 
   val paraphraseA = "自然界の物理法則は例外なくどの慣性系でも成立する。"
   val paraphraseB = "見ている慣性系によらず光速は不変である。"
-  val paraphraseC = "物体の運動する速さは光の速さを超えない。"
+  val paraphraseC = "物体の運動する速さは光の速さ未満である。"
 
   val lang ="ja_JP"
 
@@ -430,7 +430,9 @@ class HomeControllerSpecJapanese1 extends PlaySpec with BeforeAndAfter with Befo
 
   "The specification12a" should {
     "returns an appropriate response" in {
-      deleteFeatureVectorByPropositionId("52af1fe5-796c-4a1f-82ad-212fecfbe59e", transversalState)      
+      deleteFeatureVectorByPropositionId("d5420ba2-a452-4a16-87d4-d688152420cd", transversalState)      
+      deleteFeatureVectorByPropositionId("abc74aa6-e598-42bf-927e-0a8bf271300e", transversalState)      
+      deleteFeatureVectorByPropositionId("d6feec34-25f2-4197-9162-e936c5e217d2", transversalState)            
     }
   }
 

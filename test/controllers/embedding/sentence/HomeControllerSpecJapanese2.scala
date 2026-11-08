@@ -81,7 +81,7 @@ class HomeControllerSpecJapanese2 extends PlaySpec with BeforeAndAfter with Befo
 
   val paraphraseA = "自然界の物理法則は例外なくどの慣性系でも成立する。"
   val paraphraseB = "見ている慣性系によらず光速は不変である。"
-  val paraphraseC = "物体の運動する速さは光の速さを超えない。"
+  val paraphraseC = "物体の運動する速さは光の速さ未満である。"
 
   val lang = "ja_JP" 
 
