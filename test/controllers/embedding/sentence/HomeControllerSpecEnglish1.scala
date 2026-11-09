@@ -81,7 +81,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
   val sentenceNotB = "Bloody words weren't written on the floor."
   val sentenceNotC = "This must not be a murder made to look like an accident."
 
-  val paraphraseA = "The victim was lying face down."
+  val paraphraseA = "The victim was lying on his stomach."
   val paraphraseB = "There was a dying message written in blood on the floor."
   val paraphraseC = "This is suspected to be a murder disguised as an accident."
 
