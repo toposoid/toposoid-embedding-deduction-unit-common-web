@@ -194,18 +194,18 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
       case true => candidates1
       case _ => {
         val candidates2 = extractedKnowledgeBaseSideInfo.filter(x => {
-          //PropositionIdを指定して、ClaimNodeだけを選択　ORのリレーションが全くないものは自明にTrue
-          val query = "MATCH (n:SemiGlobalClaimNode) - [e:SemiGlobalEdge] - (m:SemiGlobalClaimNode) WHERE n.propositionId ='%s' AND e.logicType='OR' RETURN n, e, m".format(x.propositionId)
+          //当該sentenceで、ClaimNodeだけを選択　ANDのリレーションがあるものは自明にTrue
+          val query = "MATCH (n:SemiGlobalClaimNode) - [e:SemiGlobalEdge] - (m:SemiGlobalClaimNode) WHERE n.propositionId ='%s' AND n.sentenceId ='%s' AND e.logicType='AND' RETURN n, e, m".format(x.propositionId, x.sentenceId)
           val jsonStr: String = neo4jUtils.getCypherQueryResult(query, "e", transversalState)
           val neo4jRecords: Neo4jRecords = Json.parse(jsonStr).as[Neo4jRecords]
           neo4jRecords.records.size match {
-            case 0 => true //すでにClaimとしてsentenceが存在していて、リレーションがANDしかないのでこれがあればそれを優先する。
-            case _ => false
+            case 0 => false //すでにClaimとしてsentenceが存在していて、そのsentenceのリレーションにANDがあればそれを優先する。仮にORがあったとしても。
+            case _ => true
           }
         })
         candidates2.size > 0 match {
           case true => candidates2
-          case _ => List.empty[KnowledgeBaseSideInfo] //ORのリレーションがある場合は、真偽が自明にならない。
+          case _ => List.empty[KnowledgeBaseSideInfo] //単独でもないかつANDのリレーションもない状態（ORのリレーションしかに）場合は、真偽が自明にならない。
         }
       }
     }
