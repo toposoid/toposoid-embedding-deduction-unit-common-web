@@ -49,6 +49,7 @@ import com.ideal.linked.toposoid.common.AuthenticityType
 import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForImage
 import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForTable
 import com.ideal.linked.toposoid.common.AuthenticityType
+import controllers.TestUtilsEx.deleteFeatureVectorByPropositionId
 
 class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with BeforeAndAfterAll with GuiceOneAppPerSuite  with DefaultAwaitTimeout with Injecting {
 
@@ -73,17 +74,17 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
   override implicit def defaultAwaitTimeout: Timeout = 600.seconds
   val controller: HomeController = inject[HomeController]
 
-  val sentenceA = "The victim was lying face down."
-  val sentenceB = "Bloody words were written on the floor."
+  val sentenceA = "On a cold winter day, The victim was lying face down in the room."      
+  val sentenceB = "Looking around the entire room, A bloody message was written on the floor."
   val sentenceC = "This must be a murder made to look like an accident."
 
-  val sentenceNotA = "The victim wasn't lying face down."
-  val sentenceNotB = "Bloody words weren't written on the floor."
+  val sentenceNotA = "On a cold winter day, The victim was not lying face down in the room."      
+  val sentenceNotB = "Looking around the entire room, A bloody message was not written on the floor."
   val sentenceNotC = "This must not be a murder made to look like an accident."
 
-  val paraphraseA = "The victim was lying on his stomach."
-  val paraphraseB = "There was a dying message written in blood on the floor."
-  val paraphraseC = "This is suspected to be a murder disguised as an accident."
+  val paraphraseA = "On a cold winter day, The victim was lying on his stomach in the room."
+  val paraphraseB = "Looking around the entire room, A dying message was written on the floor."
+  val paraphraseC = "This must be a murder made to look like an incident."
 
   val lang ="en_US"
 
@@ -101,7 +102,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)      
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
@@ -119,7 +120,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)      
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   } 
 
@@ -138,8 +139,8 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.CONFLICTING.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId2, transversalState)
     }
   } 
 
@@ -162,7 +163,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   } 
 
@@ -186,7 +187,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
@@ -210,8 +211,8 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId2, transversalState)
 
     }
   }
@@ -236,8 +237,8 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId2, transversalState)
     }
   }
 
@@ -261,8 +262,8 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId2, transversalState)
     }
   }
 
@@ -286,8 +287,8 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      deleteFeatureVectorByPropositionId(propositionId2, transversalState)
     }
   }
 
@@ -310,7 +311,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)      
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)      
     }
   }
 
@@ -333,7 +334,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)      
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)      
     }
   }
 
@@ -356,7 +357,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)      
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)      
     }
   }
 
@@ -379,7 +380,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)      
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)      
     }
   }
 
@@ -402,7 +403,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.CONFLICTING.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)      
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)      
     }
   }
 
@@ -425,7 +426,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)      
+      deleteFeatureVectorByPropositionId(propositionId, transversalState)      
     }
   }
 
