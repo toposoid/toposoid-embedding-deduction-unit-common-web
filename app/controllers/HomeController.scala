@@ -137,12 +137,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     val updatedKnowledgeBaseSideInfo = getCoveredKnowledgeBaseSideInfo(extractedKnowledgeBaseSideInfo, aso, transversalState)
     if(updatedKnowledgeBaseSideInfo.size == 0) return aso
     val authenticityType = getAuthenticityType(updatedKnowledgeBaseSideInfo)
-    val status = authenticityType match {
-      case AuthenticityType.SUPPORTED => true
-      case AuthenticityType.REFUTED => true
-      case _ => false
-    }
-    val deductionResult: DeductionResult = new DeductionResult(status,authenticityType.index, unsettledCoveredPropositionEdges, updatedKnowledgeBaseSideInfo)
+    val deductionResult: DeductionResult = new DeductionResult(authenticityType.index, unsettledCoveredPropositionEdges, updatedKnowledgeBaseSideInfo)
     AnalyzedSentenceObject(aso.nodeMap, aso.edgeList, aso.knowledgeBaseSemiGlobalNode, deductionResult)
 
   }
@@ -453,7 +448,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
 
     if(endpoint.host.equals(NO_HOST) || endpoint.port.equals(NO_PORT) || endpoint.name.equals(NO_NAME)) return (targetJson, resultJson)
     val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(resultJson).as[AnalyzedSentenceObjects]
-    val notFinished = analyzedSentenceObjects.analyzedSentenceObjects.filterNot(x => x.deductionResult.status) 
+    val notFinished = analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index) 
     if(notFinished.size > 0) {
       val targets:List[AnalyzedSentenceObject] = notFinished
       //TODO:元々設定されていたDeductionConfigurationにする
@@ -486,11 +481,9 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
           case _ => {
             val confirmedCoveredPropositionEdges = x.deductionResult.coveredPropositionEdges.filter(y => y.sourceNode.isConfirmed && y.destinationNode.isConfirmed)
             val deductionReulst = DeductionResult(
-              status = x.deductionResult.status, 
               authenticityType = x.deductionResult.authenticityType, 
               coveredPropositionEdges = (confirmedCoveredPropositionEdges ++ coveredPropositionEdges.head.coveredPropositionEdges).distinct, 
               evidenceKnowledgeList = x.deductionResult.evidenceKnowledgeList, 
-              havePremiseInGivenProposition = x.deductionResult.havePremiseInGivenProposition,
               deductionPhaseType = x.deductionResult.deductionPhaseType)
             val aso = AnalyzedSentenceObject(x.nodeMap, x.edgeList, x.knowledgeBaseSemiGlobalNode, deductionReulst)
             analyze(aso, acc, endpoint.name, transversalState)

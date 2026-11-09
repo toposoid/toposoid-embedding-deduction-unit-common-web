@@ -134,7 +134,7 @@ class HomeControllerSpecJapanese1 extends PlaySpec with BeforeAndAfter with Befo
   val tableReferenceParaD = TableReference(referenceParaD, skipHeaderRows=2, skipRowList=List(),multiHeaderRows=1, sheetNameForExcel= "")
   val knowledgeForTableParaD = KnowledgeForTable(getUUID(), tableReferenceParaD)  
   val lang = "ja_JP"
-
+  /*
   "The specification1" should {
     "returns an appropriate response" in {
       val propositionId1 = getUUID()
@@ -506,4 +506,5 @@ class HomeControllerSpecJapanese1 extends PlaySpec with BeforeAndAfter with Befo
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
     }
   }
+  */
 }

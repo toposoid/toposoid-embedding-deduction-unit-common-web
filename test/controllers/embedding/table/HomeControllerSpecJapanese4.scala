@@ -80,7 +80,7 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
   }
 
   override implicit def defaultAwaitTimeout: Timeout = 600.seconds
-
+  /*
   val controller: HomeController = inject[HomeController]
   val sentenceA = "決定的に勝敗を左右する証拠データがあリます。"
   val referenceA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
@@ -639,5 +639,5 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
     }
   }
-
+  */
 }

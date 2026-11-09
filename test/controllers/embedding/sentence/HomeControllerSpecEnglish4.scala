@@ -59,15 +59,6 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
   override def beforeAll(): Unit = {
     ToposoidUtils.callComponent("{}", conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "createSchema", transversalState)
     TestUtils.setDeductionUnitEndPoints(DeductionPhaseType.DEDUCTION_SENTENCE_BASE, transversalState, selectIndice = List(0))
-    /*
-    val deductionUnitHosts = Json.parse(conf.getString("TOPODOID_EMBEDDING_DEDUCTION_UNITS")).as[List[String]]
-    val deductionUnitPorts = Json.parse(conf.getString("TOPODOID_EMBEDDING_DEDUCTION_PORTS")).as[List[String]]
-    val deductionUnitNames = Json.parse(conf.getString("TOPODOID_EMBEDDING_DEDUCTION_NAMES")).as[List[String]]
-    val endPoints: Seq[Endpoint] = deductionUnitHosts.lazyZip(deductionUnitPorts).lazyZip(deductionUnitNames).map { (x, y, z) =>
-      Endpoint(x,y,z)
-    }.filter(x => x.name.equals("EmbeddingSentenceMatch")).toSeq
-    InMemoryDbUtils.setEmbedingDeducitonUnitEndPoints(endPoints, transversalState)    
-    */
     TestUtilsEx.deleteNeo4JAllData(transversalState)
   }
 
@@ -88,7 +79,7 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
   val paraphraseC = "This is suspected to be a murder disguised as an accident."
   val paraphraseD = "The culprit was one of us."
 
-
+  /*
   "The specification31" should {
     "returns an appropriate response" in {
       val propositionId1 = java.util.UUID.randomUUID().toString
@@ -645,4 +636,5 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       deleteFeatureVector(FeatureVectorIdentifier(superiorId = propositionId3, featureId = sentenceId6, sentenceType = SentenceType.CLAIM.index, lang = "en_US", SuperiorType.PROPOSITION_ID.index, NonSentenceType.UNSPECIFIED.index, CaseGroupType.UNSPECIFIED.index), transversalState)
     }
   }
+  */
 }

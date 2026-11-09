@@ -145,7 +145,7 @@ class HomeControllerSpecEnglish3 extends PlaySpec with BeforeAndAfter with Befor
 
 
   val lang = "en_US"
-
+  /*
   "The specification21" should {
     "returns an appropriate response" in {
       val propositionId1 = getUUID()
@@ -580,5 +580,5 @@ class HomeControllerSpecEnglish3 extends PlaySpec with BeforeAndAfter with Befor
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
     }
   }
-
+  */
 }

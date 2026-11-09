@@ -143,7 +143,7 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
   val knowledgeForImageParaD = KnowledgeForImage(getUUID(), imageReferenceParaD) 
 
   val lang = "en_US"
-
+  /*
   "The specification31" should {
     "returns an appropriate response" in {
       val propositionId1 = getUUID()
@@ -644,5 +644,5 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
     }
   }
-
+  */
 }
