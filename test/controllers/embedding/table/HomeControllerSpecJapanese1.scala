@@ -71,6 +71,7 @@ class HomeControllerSpecJapanese1 extends PlaySpec with BeforeAndAfter with Befo
 
   override implicit def defaultAwaitTimeout: Timeout = 600.seconds
   val controller: HomeController = inject[HomeController]  
+
   val sentenceA = "多大なる検証に裏打ちされた、この戦いの勝敗を分かつ決定的な証拠データを提出します。"
   val sentenceNotA = "多大なる検証に裏打ちされた、この戦いの勝敗を分かつ決定的な証拠データを提出しません。"
   val referenceA = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
