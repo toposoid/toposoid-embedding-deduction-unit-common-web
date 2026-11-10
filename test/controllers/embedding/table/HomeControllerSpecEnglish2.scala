@@ -82,8 +82,8 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
   val tableReferenceA = TableReference(referenceA, skipHeaderRows=5, skipRowList=List(),multiHeaderRows=4, sheetNameForExcel= "se0101")
   val knowledgeForTableA = KnowledgeForTable(getUUID(), tableReferenceA)  
 
-  val sentenceB = "Based on the latest sales data, we need to change our strategy."
-  val sentenceNotB = "Based on the latest sales data, we don't need to change our strategy."
+  val sentenceB = "The server well-suited for data-driven processing is used for storing and processing large amounts of marketing data for discovering potential customers."
+  val sentenceNotB = "The server well-suited for data-driven processing is not used for storing and processing large amounts of marketing data for discovering potential customers."
   val referenceB = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table2.csv")
   val tableReferenceB = TableReference(referenceB, skipHeaderRows=8, skipRowList=List(),multiHeaderRows=1, sheetNameForExcel= "")  
@@ -107,7 +107,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
   val tableReferenceParaA = TableReference(referenceParaA, skipHeaderRows=5, skipRowList=List(),multiHeaderRows=4, sheetNameForExcel= "se0101")
   val knowledgeForTableParaA = KnowledgeForTable(getUUID(), tableReferenceParaA)
 
-  val paraphraseB = "Based on the latest sales statistics, we need to change our strategy."
+  val paraphraseB = "The server well-suited for data-driven processing is used for storing and processing large amounts of marketing sample for discovering potential customers."
   val referenceParaB = Reference(url = "", surface = "", surfaceIndex = -1, isWholeSentence = true,
     originalUrlOrReference = "/app/toposoid-embedding-deduction-unit-common-web/test/data/tables/test_table2.csv")
   val tableReferenceParaB = TableReference(referenceParaB, skipHeaderRows=8, skipRowList=List(),multiHeaderRows=1, sheetNameForExcel= "")
