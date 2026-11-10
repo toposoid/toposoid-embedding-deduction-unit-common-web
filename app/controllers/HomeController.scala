@@ -101,13 +101,19 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
         val deductionUnits = x.sourceNode.matchedKnowledgeNodes.map(y => y.deductionUnit) ::: x.destinationNode.matchedKnowledgeNodes.map(y => (y.deductionUnit))
 
         if(confirmedSentenceIds.size > 0){
+
+          //isNegativeMeaningは、featureInfoのfeatureTypeがSENTENCE以外に対しては、featureTypeがSENTENCEのもの全ての＆演算の結果を保存する。
+          val isNegativeMeaningForNotSentence = distinctMatchedKnowledgeNodes.filter(y => y.featureInfo.featureType == FeatureType.SENTENCE.index).foldLeft(true){
+            (acc, y) => acc & y.isNegativeMeaning
+          }
+
           val confirmedKnowledgeBaseSideInfoList:List[KnowledgeBaseSideInfo] = distinctMatchedKnowledgeNodes.map(y => {
             KnowledgeBaseSideInfo(
               propositionId = y.propositionId,
               sentenceId = y.sentenceId,
               featureInfoList =List(y.featureInfo),
               deductionUnits = deductionUnits,
-              isNegativeMeaning = y.isNegativeMeaning       
+              isNegativeMeaning = if (y.featureInfo.featureType == FeatureType.SENTENCE.index) y.isNegativeMeaning else isNegativeMeaningForNotSentence
             )
           })
           acc ::: confirmedKnowledgeBaseSideInfoList
@@ -174,7 +180,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   private def checkOtherRelation(extractedKnowledgeBaseSideInfo: List[KnowledgeBaseSideInfo], transversalState:TransversalState): List[KnowledgeBaseSideInfo] = {
     //すでに各DeductionUnitで、Claim側にsentenceが存在していることが保証されている。
     //そのSentenceのリレーションも調べて、自明に真と確定できるものをさらに抽出。
-    //まず単徳の主張だけで真と言えるものを優先する。
+    //まず単独の主張だけで真と言えるものを優先する。
     val neo4jUtils = Neo4JUtilsImpl()
     val candidates1 = extractedKnowledgeBaseSideInfo.filter(x => {
       val query = "MATCH (n:SemiGlobalClaimNode) - [e:SemiGlobalEdge] - (m:SemiGlobalClaimNode) WHERE n.sentenceId ='%s'  RETURN n, e, m".format(x.sentenceId)
