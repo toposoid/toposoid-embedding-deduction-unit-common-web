@@ -87,7 +87,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
 
   val lang ="en_US"
 
-  "The specification11" should {
+  "The specification2_1" should {
     "returns an appropriate response" in {
 
       val propositionId = TestUtilsEx.registerKnowledge(
@@ -115,7 +115,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification12" should {
+  "The specification2_2" should {
     "returns an appropriate response" in {
 
       val propositionId = TestUtilsEx.registerKnowledge(
@@ -143,7 +143,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification13" should {
+  "The specification2_3" should {
     "returns an appropriate response" in {
 
       val propositionId = TestUtilsEx.registerKnowledge(
@@ -171,7 +171,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification14" should {
+  "The specification2_4" should {
     "returns an appropriate response" in {
 
       val propositionId = TestUtilsEx.registerKnowledge(
@@ -199,7 +199,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification15" should {
+  "The specification2_5" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -232,7 +232,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification16" should {
+  "The specification2_6" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -265,7 +265,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification17" should {
+  "The specification2_7" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -298,7 +298,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification18" should {
+  "The specification2_8" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -331,7 +331,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification19" should {
+  "The specification2_9" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -359,7 +359,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification20" should {
+  "The specification2_10" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -387,7 +387,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification21" should {
+  "The specification2_11" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -415,7 +415,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification22" should {
+  "The specification2_12" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -443,7 +443,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification23" should {
+  "The specification2_13" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -471,7 +471,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification24" should {
+  "The specification2_14" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -499,7 +499,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification25" should {
+  "The specification2_15" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -527,7 +527,7 @@ class HomeControllerSpecEnglish2 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification26" should {
+  "The specification2_16" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,

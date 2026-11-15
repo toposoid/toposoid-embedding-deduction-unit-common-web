@@ -90,7 +90,7 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
 
   val lang = "en_US"
 
-  "The specification31" should {
+  "The specification4_1" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -115,11 +115,11 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)          
     }
   }
 
-  "The specification32" should {
+  "The specification4_2" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -150,12 +150,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }
 
-  "The specification33" should {
+  "The specification4_3" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -186,12 +186,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }
 
-  "The specification34" should {
+  "The specification4_4" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -222,12 +222,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }
 
-  "The specification35" should {
+  "The specification4_5" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -258,12 +258,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }  
 
-  "The specification36" should {
+  "The specification4_6" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -288,11 +288,11 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)          
     }
   }
   
-  "The specification37" should {
+  "The specification4_7" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -323,12 +323,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }
 
-  "The specification38" should {
+  "The specification4_8" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -359,12 +359,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }
 
-  "The specification39" should {
+  "The specification4_9" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -395,12 +395,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }
 
-  "The specification40" should {
+  "The specification4_10" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -431,12 +431,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }    
 
-  "The specification41" should {
+  "The specification4_11" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -467,12 +467,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }
 
-  "The specification42" should {
+  "The specification4_12" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -503,12 +503,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }  
 
-  "The specification43" should {
+  "The specification4_13" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -539,13 +539,13 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }  
 
 
-  "The specification44" should {
+  "The specification4_14" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -576,12 +576,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }   
 
-  "The specification45" should {
+  "The specification4_15" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -612,12 +612,12 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
   }   
 
-  "The specification46" should {
+  "The specification4_16" should {
     "returns an appropriate response" in {
       val propositionId1 = TestUtilsEx.registerKnowledge(
         lang =lang,
@@ -648,9 +648,9 @@ class HomeControllerSpecEnglish4 extends PlaySpec with BeforeAndAfter with Befor
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)
       assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index ).size == 1)
-      deleteFeatureVectorByPropositionId(propositionId1, transversalState)
-      deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
+      //deleteFeatureVectorByPropositionId(propositionId1, transversalState)
+      //deleteFeatureVectorByPropositionId(propositionId2, transversalState)          
     }
-  }   
+  }  
 
 }
