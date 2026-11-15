@@ -124,7 +124,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
 
   val lang = "en_US"
 
-  "The specification1" should {
+    "The specification1_1" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List(knowledgeForImageA), List.empty[KnowledgeForTable])))
       val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
@@ -142,26 +142,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-  "The specification2" should {
-    "returns an appropriate response" in {
-      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageA), List.empty[KnowledgeForTable])))
-      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
-      val fr = FakeRequest(POST, "/execute")
-        .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
-        .withJsonBody(Json.parse(json))
-      val result = call(controller.execute(), fr)
-      status(result) mustBe OK
-      contentType(result) mustBe Some("application/json")
-      val jsonResult: String = contentAsJson(result).toString()
-      val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)      
-      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
-    }
-  }
-
-
-  "The specification3" should {
+  "The specification1_2" should {
     "returns an appropriate response" in {
       val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List(knowledgeForImageB), List.empty[KnowledgeForTable])))
       val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
@@ -179,10 +160,9 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
     }
   }
 
-
-  "The specification4" should {
+  "The specification1_3" should {
     "returns an appropriate response" in {
-      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceB, List(knowledgeForImageB), List.empty[KnowledgeForTable])))
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List.empty[KnowledgeForImage], List.empty[KnowledgeForTable])))
       val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
@@ -197,20 +177,13 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
-  /*
-  "The specification1" should {
+
+
+
+  "The specification1_4" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()      
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List.empty[KnowledgeForParser]
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      //val json = ToposoidUtils.callComponent(inputSentence, conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_HOST"), conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_PORT"), "analyze")
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageA), List.empty[KnowledgeForTable])))
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -219,34 +192,16 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification2" should {
+  "The specification1_5" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      val sentenceId2 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-
-      val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
-        List(KnowledgeForParser(propositionId1, sentenceId1, knowledge1)),
-        List.empty[PropositionRelation],
-        List(KnowledgeForParser(propositionId1, sentenceId2, knowledge2)),
-        List.empty[PropositionRelation])
-      registerData(knowledgeSentenceSetForParser, transversalState)
-      Thread.sleep(5000)
-
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List.empty[KnowledgeForParser]
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageB), List.empty[KnowledgeForTable])))
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -255,34 +210,16 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification3" should {
+  "The specification1_6" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      val sentenceId2 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
-
-      val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
-        List(KnowledgeForParser(propositionId1, sentenceId1, knowledge1)),
-        List.empty[PropositionRelation],
-        List(KnowledgeForParser(propositionId1, sentenceId2, knowledge2)),
-        List.empty[PropositionRelation])
-      registerData(knowledgeSentenceSetForParser, transversalState)
-      Thread.sleep(5000)
-
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge =List.empty[KnowledgeForParser]
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List.empty[KnowledgeForImage], List.empty[KnowledgeForTable])))
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -291,38 +228,18 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification4" should {
+  "The specification1_7" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val propositionId2 = getUUID()
-      val sentenceId1 = getUUID()
-      val sentenceId2 = getUUID()
-      val sentenceId3 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List(knowledgeForImageA), List.empty[KnowledgeForTable])))
+      val propositionId2 = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageA), List.empty[KnowledgeForTable])))
 
-      val knowledge1a = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
-        List(KnowledgeForParser(propositionId2, sentenceId2, knowledge1a)),
-        List.empty[PropositionRelation],
-        List(KnowledgeForParser(propositionId2, sentenceId3, knowledge2)),
-        List.empty[PropositionRelation])
-      registerData(knowledgeSentenceSetForParser, transversalState)
-      Thread.sleep(5000)
-
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List.empty[KnowledgeForParser]
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -331,26 +248,18 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.CONFLICTING.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification5" should {
+  "The specification1_8" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List(knowledgeForImageA), List.empty[KnowledgeForTable])))
+      val propositionId2 = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageB), List.empty[KnowledgeForTable])))
+
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -359,27 +268,18 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.SUPPORTED.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification6" should {
+  "The specification1_9" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List(knowledgeForImageB), List.empty[KnowledgeForTable])))
+      val propositionId2 = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageA), List.empty[KnowledgeForTable])))
 
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge2), transversalState)
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -388,35 +288,18 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.REFUTED.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification7" should {
+  "The specification1_10" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      val sentenceId2 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List(knowledgeForImageB), List.empty[KnowledgeForTable])))
+      val propositionId2 = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageB), List.empty[KnowledgeForTable])))
 
-      val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
-        List(KnowledgeForParser(propositionId1, sentenceId1, knowledge1)),
-        List.empty[PropositionRelation],
-        List(KnowledgeForParser(propositionId1, sentenceId2, knowledge2)),
-        List.empty[PropositionRelation])
-      registerData(knowledgeSentenceSetForParser, transversalState)
-      Thread.sleep(5000)
-
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -425,40 +308,18 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification8" should {
+  "The specification1_11" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val propositionId2 = getUUID()
-      val sentenceId1 = getUUID()
-      val sentenceId2 = getUUID()
-      val sentenceId3 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
+      val propositionId = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceA, List(knowledgeForImageC), List.empty[KnowledgeForTable])))
+      val propositionId2 = TestUtilsEx.registerKnowledge(lang,transversalState, List((sentenceNotA, List(knowledgeForImageC), List.empty[KnowledgeForTable])))
 
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
-      val knowledge1a = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-
-      val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
-        List(KnowledgeForParser(propositionId2, sentenceId2, knowledge1a)),
-        List.empty[PropositionRelation],
-        List(KnowledgeForParser(propositionId2, sentenceId3, knowledge2)),
-        List.empty[PropositionRelation])
-      registerData(knowledgeSentenceSetForParser, transversalState)
-      Thread.sleep(5000)
-
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -467,32 +328,21 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 1)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification8A" should {
+  "The specification1_12" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val propositionId2 = getUUID()
-      val sentenceId1 = getUUID()
-      val sentenceId2 = getUUID()
-      val sentenceId3 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
-
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
-      registerSingleClaim(KnowledgeForParser(propositionId2, sentenceId2, knowledge2), transversalState)
-
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1))
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val propositionId1 = TestUtilsEx.registerKnowledge(
+        lang =lang,
+        transversalState=transversalState, 
+        premises = List((sentenceA, List(knowledgeForImageA), List.empty[KnowledgeForTable])),
+        claims = List((sentenceB, List(knowledgeForImageB), List.empty[KnowledgeForTable]))
+      )            
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -501,29 +351,21 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
 
-  "The specification9" should {
+  "The specification1_13" should {
     "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      //val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      //val knowledge3 = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
-      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
-
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge1), transversalState)
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+      val propositionId1 = TestUtilsEx.registerKnowledge(
+        lang =lang,
+        transversalState=transversalState, 
+        premises = List((sentenceB, List(knowledgeForImageB), List.empty[KnowledgeForTable])),
+        claims = List((sentenceA, List(knowledgeForImageA), List.empty[KnowledgeForTable]))
+      )            
+      val json = TestUtilsEx.prepairInputJson(lang, transversalState, List((paraphraseA, List(knowledgeForImageParaA), List.empty[KnowledgeForTable])))
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(json))
@@ -532,41 +374,9 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
       contentType(result) mustBe Some("application/json")
       val jsonResult: String = contentAsJson(result).toString()
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index)).size == 0)
+      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index)  && x.deductionResult.authenticityType == AuthenticityType.INSUFFICIENT.index).size == 1)      
+      //deleteFeatureVectorByPropositionId(propositionId, transversalState)
     }
   }
-
-  "The specification10" should {
-    "returns an appropriate response" in {
-      val propositionId1 = getUUID()
-      val sentenceId1 = getUUID()
-      //val knowledge1 = Knowledge(lang=lang, sentence=sentenceA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageA, transversalState)))
-      val knowledge2 = Knowledge(lang=lang, sentence=sentenceB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageB, transversalState)))
-      //val knowledge3 = Knowledge(lang=lang, sentence=sentenceC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageC, transversalState)))
-      val paraphrase1 = Knowledge(lang=lang, sentence=paraphraseA, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaA, transversalState)))
-      val paraphrase2 = Knowledge(lang=lang, sentence=paraphraseB, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaB, transversalState)))
-      val paraphrase3 = Knowledge(lang=lang, sentence=paraphraseC, extentInfoJson = "{}", knowledgeForImages=List(uploadImage(knowledgeForImageParaC, transversalState)))
-
-      registerSingleClaim(KnowledgeForParser(propositionId1, sentenceId1, knowledge2), transversalState)
-      val propositionIdForInference = getUUID()
-      val premiseKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase1), KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase2))
-      val claimKnowledge = List(KnowledgeForParser(propositionIdForInference, getUUID(), paraphrase3))
-      val inputSentenceForParser = InputSentenceForParser(premiseKnowledge, claimKnowledge, ActionModeType.DEDUCTION_MODE.index)
-      val json = getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
-      val fr = FakeRequest(POST, "/execute")
-        .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
-        .withJsonBody(Json.parse(json))
-      val result = call(controller.execute(), fr)
-      status(result) mustBe OK
-      contentType(result) mustBe Some("application/json")
-      val jsonResult: String = contentAsJson(result).toString()
-      val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(jsonResult).as[AnalyzedSentenceObjects]
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.PREMISE.index) && x.deductionResult.status).size == 1)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.status).size == 0)
-      assert(analyzedSentenceObjects.analyzedSentenceObjects.filter(x => x.knowledgeBaseSemiGlobalNode.sentenceType.equals(SentenceType.CLAIM.index) && x.deductionResult.havePremiseInGivenProposition).size == 0)
-    }
-  }
-  */
 }
