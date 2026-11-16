@@ -23,7 +23,7 @@ import com.ideal.linked.toposoid.knowledgebase.featurevector.model.FeatureVector
 import com.ideal.linked.toposoid.knowledgebase.regist.model.PropositionRelation
 import com.ideal.linked.toposoid.protocol.model.neo4j.Neo4jRecords
 import com.ideal.linked.toposoid.protocol.model.parser.{KnowledgeForParser, KnowledgeSentenceSetForParser}
-import com.ideal.linked.toposoid.test.utils.TestUtils
+import com.ideal.linked.toposoid.test.utils.TestUtils.{uploadImage, uploadTable, getAnalyzedSentenceObjectsJsonForSemiGlobal, registerData}
 import play.api.libs.json.Json
 import com.ideal.linked.toposoid.protocol.model.base.AnalyzedSentenceObjects
 import com.ideal.linked.toposoid.protocol.model.base.AnalyzedSentenceObject
@@ -39,6 +39,13 @@ import com.ideal.linked.toposoid.knowledgebase.regist.model.Reference
 import com.ideal.linked.toposoid.knowledgebase.regist.model.ImageReference
 import com.ideal.linked.toposoid.knowledgebase.regist.model.Knowledge
 import com.ideal.linked.toposoid.protocol.model.frontend.Endpoint
+import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForTable
+import com.ideal.linked.toposoid.protocol.model.parser.InputSentenceForParser
+import com.ideal.linked.toposoid.common.ActionModeType
+import com.ideal.linked.toposoid.common.SentenceType
+import com.ideal.linked.toposoid.common.SuperiorType
+import com.ideal.linked.toposoid.common.NonSentenceType
+import com.ideal.linked.toposoid.common.CaseGroupType
 
 //case class ImageBoxInfo(x:Int, y:Int, weight:Int, height:Int)
 
@@ -59,13 +66,19 @@ object TestUtilsEx {
       List.empty[PropositionRelation],
       List(knowledgeForParser),
       List.empty[PropositionRelation])
-    TestUtils.registerData(knowledgeSentenceSetForParser, transversalState, addVectorFlag = true)
+    registerData(knowledgeSentenceSetForParser, transversalState, addVectorFlag = true)
     Thread.sleep(5000)
   }
 
-  def deleteFeatureVector(featureVectorIdentifier: FeatureVectorIdentifier, transversalState:TransversalState): Unit = {
+  def deleteFeatureVector(featureVectorIdentifier: FeatureVectorIdentifier, transversalState:TransversalState): Unit = {    
     val json: String = Json.toJson(featureVectorIdentifier).toString()
     ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "delete", transversalState)
+  }
+
+  def deleteFeatureVectorByPropositionId(propositionId: String, transversalState:TransversalState): Unit = {
+    val featureVectorIdentifier= FeatureVectorIdentifier(superiorId = propositionId, featureId = "dummy", sentenceType = SentenceType.CLAIM.index, lang = "ja_JP", SuperiorType.PROPOSITION_ID.index, NonSentenceType.UNSPECIFIED.index, CaseGroupType.UNSPECIFIED.index)
+    val json: String = Json.toJson(featureVectorIdentifier).toString()
+    ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "deleteBySuperiorId", transversalState)
   }
   var usedUuidList = List.empty[String]
 
@@ -77,103 +90,50 @@ object TestUtilsEx {
     usedUuidList = usedUuidList :+ uuid
     uuid
   }
-  /*
-  def getKnowledge(lang:String, sentence: String, reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): Knowledge = {
-    Knowledge(sentence, lang, "{}", false, List(getImageInfo(reference, imageBoxInfo, transversalState)))
-  }
-  
-  def getImageInfo(reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): KnowledgeForImage = {
-    val imageReference = ImageReference(reference: Reference, imageBoxInfo.x, imageBoxInfo.y, imageBoxInfo.weight, imageBoxInfo.height)
-    val knowledgeForImage = KnowledgeForImage(id = getUUID(), imageReference = imageReference)
-    val registContentResultJson = ToposoidUtils.callComponent(
-      Json.toJson(knowledgeForImage).toString(),
-      conf.getString("TOPOSOID_CONTENTS_ADMIN_HOST"),
-      conf.getString("TOPOSOID_CONTENTS_ADMIN_PORT"),
-      "registImage",
-      transversalState)
-    val registContentResult: RegistContentResult = Json.parse(registContentResultJson).as[RegistContentResult]
-    registContentResult.knowledgeForImage
-  }
-  
-  def addImageInfoToAnalyzedSentenceObjects(lang:String,inputSentence: String, knowledgeForImages: List[KnowledgeForImage], transversalState:TransversalState): String = {
-    /**
-     * CAUTION This function does not support cases where one node has multiple images!!!
-     */
-    val json = lang match {
-      case "ja_JP" => ToposoidUtils.callComponent(inputSentence, conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_HOST"), conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_PORT"), "analyze", transversalState)
-      case "en_US" => ToposoidUtils.callComponent(inputSentence, conf.getString("TOPOSOID_SENTENCE_PARSER_EN_WEB_HOST"), conf.getString("TOPOSOID_SENTENCE_PARSER_EN_WEB_PORT"), "analyze", transversalState)
-    }
 
-    val asos: AnalyzedSentenceObjects = Json.parse(json).as[AnalyzedSentenceObjects]
-    val updatedAsos = asos.analyzedSentenceObjects.foldLeft(List.empty[AnalyzedSentenceObject]) {
-      (acc, x) => {
-
-        val knowledgeForImage = knowledgeForImages(acc.size)
-
-        val knowledgeFeatureReference = KnowledgeFeatureReference(
-          propositionId = x.knowledgeBaseSemiGlobalNode.propositionId,
-          sentenceId = x.knowledgeBaseSemiGlobalNode.sentenceId,
-          featureId = getUUID(),
-          featureType = FeatureType.IMAGE.index,
-          url = knowledgeForImage.imageReference.reference.url,
-          source = knowledgeForImage.imageReference.reference.originalUrlOrReference,
-          featureInputType = DataEntryType.MANUAL.index,
-          extentText = "{}")
-
-        val localContextForFeature = LocalContextForFeature(
-          x.knowledgeBaseSemiGlobalNode.localContextForFeature.lang,
-          List(knowledgeFeatureReference))
-
-        val knowledgeBaseSemiGlobalNode = KnowledgeBaseSemiGlobalNode(
-          sentenceId = x.knowledgeBaseSemiGlobalNode.sentenceId,
-          propositionId = x.knowledgeBaseSemiGlobalNode.propositionId,
-          documentId = x.knowledgeBaseSemiGlobalNode.documentId,
-          sentence = x.knowledgeBaseSemiGlobalNode.sentence,
-          sentenceType = x.knowledgeBaseSemiGlobalNode.sentenceType,
-          localContextForFeature = localContextForFeature)
-
-
-        acc :+ AnalyzedSentenceObject(
-          nodeMap = x.nodeMap,
-          edgeList = x.edgeList,
-          knowledgeBaseSemiGlobalNode = knowledgeBaseSemiGlobalNode,
-          deductionResult = x.deductionResult)
-      }
-    }
-    Json.toJson(AnalyzedSentenceObjects(updatedAsos, asos.deductionConfiguration)).toString()
-  }
-
-
-  def analyzeByBaseDeductionUnitForSemiGlobal(asosJson:String, transversalState: TransversalState):String = {
-  
-    val deductionUnitHosts = Json.parse(conf.getString("TOPODOID_EMBEDDING_DEDUCTION_UNITS")).as[List[String]]
-    val deductionUnitPorts = Json.parse(conf.getString("TOPODOID_EMBEDDING_DEDUCTION_PORTS")).as[List[String]]
-    val deductionUnitNames = Json.parse(conf.getString("TOPODOID_EMBEDDING_DEDUCTION_NAMES")).as[List[String]]
-    val endPoint: Endpoint = deductionUnitHosts.lazyZip(deductionUnitPorts).lazyZip(deductionUnitNames).map { (x, y, z) =>
-      Endpoint(x,y,z)
-    }.filter(x => x.name.equals("EmbeddingSentenceMatch")).head
-
-    val json = ToposoidUtils.callComponent(asosJson, endPoint.host, endPoint.port, "execute", transversalState)
-    val verifyingEdges = Json.parse(json).as[List[VerifyingEdges]]
-    val analyzedSentenceObjects = Json.parse(asosJson).as[AnalyzedSentenceObjects]
-    val asos = analyzedSentenceObjects.analyzedSentenceObjects
+  def registerKnowledge(
+    lang:String,
+    transversalState:TransversalState,
+    claims:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])], 
+    claimRelations:List[PropositionRelation] = List.empty[PropositionRelation], 
+    premises:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])]=List.empty[(String, List[KnowledgeForImage], List[KnowledgeForTable])], 
+    premiseRelations:List[PropositionRelation] = List.empty[PropositionRelation],
+    addVectorFlag:Boolean = true
+    ):String = {
     
-    val updatedAsos = asos.foldLeft(List.empty[AnalyzedSentenceObject]){
-      (acc, x) => {
-        val coveredPropositionEdges = verifyingEdges.filter(y => y.sentenceId.equals(x.knowledgeBaseSemiGlobalNode.sentenceId)).head.coveredPropositionEdges
-        val updatedDeductionReult = DeductionResult(
-          status = x.deductionResult.status, 
-          authenticityType = x.deductionResult.authenticityType, 
-          coveredPropositionEdges = coveredPropositionEdges, 
-          evidenceKnowledgeList = x.deductionResult.evidenceKnowledgeList, 
-          havePremiseInGivenProposition = x.deductionResult.havePremiseInGivenProposition, 
-          deductionPhaseType = x.deductionResult.deductionPhaseType
-        )        
-        acc :+ AnalyzedSentenceObject(x.nodeMap, x.edgeList, x.knowledgeBaseSemiGlobalNode, updatedDeductionReult)
-      }
-    }
-    Json.toJson(AnalyzedSentenceObjects(updatedAsos, analyzedSentenceObjects.deductionConfiguration)).toString
-    
+    val propositionId = getUUID()
+    val claimKnowledgeForParsers =  claims.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+    val premiseKnowledgeForParsers =  premises.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+
+    val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
+      premiseKnowledgeForParsers,
+      premiseRelations,
+      claimKnowledgeForParsers,
+      claimRelations)
+
+    registerData(knowledgeSentenceSetForParser, transversalState, addVectorFlag=addVectorFlag)
+    propositionId
+
   }
-  */
+
+  def prepairInputJson(
+    lang:String,
+    transversalState:TransversalState,
+    claims:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])], 
+    premises:List[(String, List[KnowledgeForImage], List[KnowledgeForTable])]=List.empty[(String, List[KnowledgeForImage], List[KnowledgeForTable])]
+  ):String = {
+    val propositionId = getUUID()
+    val claimKnowledgeForParsers =  claims.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+    val premiseKnowledgeForParsers =  premises.map(x => {
+      KnowledgeForParser(propositionId, getUUID(), Knowledge(x._1, lang, "{}", false, x._2.map(uploadImage(_, transversalState)), x._3.map(uploadTable(_, transversalState))))
+    })
+    val inputSentenceForParser = InputSentenceForParser(premiseKnowledgeForParsers, claimKnowledgeForParsers, ActionModeType.DEDUCTION_MODE.index)
+    getAnalyzedSentenceObjectsJsonForSemiGlobal(lang,inputSentenceForParser, transversalState)
+  }  
 }
