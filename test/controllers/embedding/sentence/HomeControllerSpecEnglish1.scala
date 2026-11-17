@@ -57,6 +57,7 @@ class HomeControllerSpecEnglish1 extends PlaySpec with BeforeAndAfter with Befor
   val transversalStateJson:String = Json.toJson(transversalState).toString()
 
   before {
+    ToposoidUtils.callComponent("{}", conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "createSchema", transversalState)
     TestUtilsEx.deleteNeo4JAllData(transversalState)
     Thread.sleep(5000)
   }
